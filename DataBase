@@ -1,0 +1,506 @@
+-- Eliminar tablas si existen
+IF EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'dbo.Chat') AND type in (N'U'))
+    DROP TABLE dbo.Chat;
+GO
+IF EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'dbo.Calificacion') AND type in (N'U'))
+    DROP TABLE dbo.Calificacion;
+GO
+IF EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'dbo.Examen') AND type in (N'U'))
+    DROP TABLE dbo.Examen;
+GO
+IF EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'dbo.Tarea') AND type in (N'U'))
+    DROP TABLE dbo.Tarea;
+GO
+IF EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'dbo.Usuario_Curso') AND type in (N'U'))
+    DROP TABLE dbo.Usuario_Curso;
+GO
+IF EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'dbo.Recomendacion') AND type in (N'U'))
+    DROP TABLE dbo.Recomendacion;
+GO
+IF EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'dbo.Curso') AND type in (N'U'))
+    DROP TABLE dbo.Curso;
+GO
+IF EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'dbo.Docente') AND type in (N'U'))
+    DROP TABLE dbo.Docente;
+GO
+IF EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'dbo.Usuario') AND type in (N'U'))
+    DROP TABLE dbo.Usuario;
+GO
+IF EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'dbo.Universidad') AND type in (N'U'))
+    DROP TABLE dbo.Universidad;
+GO
+
+-- Crear tablas
+CREATE TABLE Universidad (
+    Id_universidad INT PRIMARY KEY,
+    Nombre VARCHAR(100) NOT NULL
+);
+
+CREATE TABLE Usuario (
+    Id_usuario INT PRIMARY KEY,
+    Nombre VARCHAR(100) NOT NULL,
+    Apellido VARCHAR(100) NOT NULL,
+    Telefono VARCHAR(15),
+    Fecha_nacimiento DATE,
+    Correo VARCHAR(150) UNIQUE,
+    Colegio_universidad VARCHAR(100),
+    Id_universidad INT,
+    FOREIGN KEY (Id_universidad) REFERENCES Universidad(Id_universidad) ON DELETE SET NULL
+);
+
+CREATE TABLE Docente (
+    Id_docente INT PRIMARY KEY,
+    Nombre VARCHAR(100) NOT NULL,
+    Apellido VARCHAR(100) NOT NULL
+);
+
+CREATE TABLE Recomendacion (
+    Id_recomendacion INT PRIMARY KEY,
+    Descripcion VARCHAR(255),
+    Id_usuario INT,
+    Id_docente INT,
+    FOREIGN KEY (Id_usuario) REFERENCES Usuario(Id_usuario) ON DELETE CASCADE,
+    FOREIGN KEY (Id_docente) REFERENCES Docente(Id_docente) ON DELETE SET NULL
+);
+
+CREATE TABLE Curso (
+    Id_curso INT PRIMARY KEY,
+    Nombre VARCHAR(100) NOT NULL
+);
+
+CREATE TABLE Tarea (
+    Id_tarea INT PRIMARY KEY,
+    Descripcion VARCHAR(255),
+    Id_curso INT,
+    FOREIGN KEY (Id_curso) REFERENCES Curso(Id_curso) ON DELETE CASCADE
+);
+
+CREATE TABLE Examen (
+    Id_examen INT PRIMARY KEY,
+    Disciplina VARCHAR(255),
+    Id_curso INT,
+    FOREIGN KEY (Id_curso) REFERENCES Curso(Id_curso) ON DELETE CASCADE
+);
+
+CREATE TABLE Chat (
+    Id_chat INT PRIMARY KEY,
+    Contenido VARCHAR(255),
+    Fecha DATE,
+    Id_usuario INT,
+    Id_docente INT,
+    FOREIGN KEY (Id_usuario) REFERENCES Usuario(Id_usuario) ON DELETE CASCADE,
+    FOREIGN KEY (Id_docente) REFERENCES Docente(Id_docente) ON DELETE SET NULL
+);
+
+CREATE TABLE Calificacion (
+    Id_calificacion INT PRIMARY KEY,
+    Puntaje DECIMAL(5,2) CHECK (Puntaje BETWEEN 0 AND 100),
+    Fecha_calificacion DATE NOT NULL,
+    Comentarios VARCHAR(255),
+    Id_docente INT,
+    FOREIGN KEY (Id_docente) REFERENCES Docente(Id_docente) ON DELETE SET NULL
+);
+
+CREATE TABLE Usuario_Curso (
+    Id_usuario INT,
+    Id_curso INT,
+    PRIMARY KEY (Id_usuario, Id_curso),
+    FOREIGN KEY (Id_usuario) REFERENCES Usuario(Id_usuario) ON DELETE CASCADE,
+    FOREIGN KEY (Id_curso) REFERENCES Curso(Id_curso) ON DELETE CASCADE
+);
+
+
+--INSERCIÓN 
+
+INSERT INTO Universidad (Id_universidad, Nombre) VALUES (1, 'Universidad de lima');
+INSERT INTO Universidad (Id_universidad, Nombre) VALUES (2, 'Pontificia Universidad Católica del Perú');
+INSERT INTO Universidad (Id_universidad, Nombre) VALUES (3, 'Universidad de Buenos Aires');
+INSERT INTO Universidad (Id_universidad, Nombre) VALUES (4, 'Universidad de Chile');
+INSERT INTO Universidad (Id_universidad, Nombre) VALUES (5, 'Universidad de São Paulo');
+INSERT INTO Universidad (Id_universidad, Nombre) VALUES (6, 'Massachusetts Institute of Technology');
+INSERT INTO Universidad (Id_universidad, Nombre) VALUES (7, 'Stanford University');
+INSERT INTO Universidad (Id_universidad, Nombre) VALUES (8, 'University of Cambridge');
+INSERT INTO Universidad (Id_universidad, Nombre) VALUES (9, 'University of Oxford');
+INSERT INTO Universidad (Id_universidad, Nombre) VALUES (10, 'Harvard University');
+
+INSERT INTO Usuario (Id_usuario, Nombre, Apellido, Telefono, Fecha_nacimiento, Correo, Colegio_universidad, Id_universidad) 
+VALUES (1, 'Carlos', 'Ramírez', '5551234567', '1999-04-15', 'carlos.ramirez@gmail.com', 'Colegio Nacional Lima', 2);
+
+INSERT INTO Usuario (Id_usuario, Nombre, Apellido, Telefono, Fecha_nacimiento, Correo, Colegio_universidad, Id_universidad) 
+VALUES (2, 'Ana', 'Torres', '5557654321', '2000-11-23', 'ana.torres@yahoo.com', 'Colegio Los Robles', 3);
+
+INSERT INTO Usuario (Id_usuario, Nombre, Apellido, Telefono, Fecha_nacimiento, Correo, Colegio_universidad, Id_universidad) 
+VALUES (3, 'Pedro', 'Gómez', '5559876543', '1998-06-10', 'pedro.gomez@hotmail.com', 'Colegio Santa María', 4);
+
+INSERT INTO Usuario (Id_usuario, Nombre, Apellido, Telefono, Fecha_nacimiento, Correo, Colegio_universidad, Id_universidad) 
+VALUES (4, 'Lucía', 'Pérez', '5554567890', '1997-08-30', 'lucia.perez@gmail.com', 'Colegio San Ignacio', 1);
+
+INSERT INTO Usuario (Id_usuario, Nombre, Apellido, Telefono, Fecha_nacimiento, Correo, Colegio_universidad, Id_universidad) 
+VALUES (5, 'Jorge', 'Fernández', '5553456789', '1995-02-20', 'jorge.fernandez@outlook.com', 'Colegio Nacional Perú', 5);
+
+INSERT INTO Usuario (Id_usuario, Nombre, Apellido, Telefono, Fecha_nacimiento, Correo, Colegio_universidad, Id_universidad) 
+VALUES (6, 'María', 'López', '5552345678', '2001-01-10', 'maria.lopez@gmail.com', 'Colegio La Paz', 6);
+
+INSERT INTO Usuario (Id_usuario, Nombre, Apellido, Telefono, Fecha_nacimiento, Correo, Colegio_universidad, Id_universidad) 
+VALUES (7, 'Felipe', 'Hernández', '5551236789', '1996-03-14', 'felipe.hernandez@gmail.com', 'Colegio Central', 7);
+
+INSERT INTO Usuario (Id_usuario, Nombre, Apellido, Telefono, Fecha_nacimiento, Correo, Colegio_universidad, Id_universidad) 
+VALUES (8, 'Sara', 'Morales', '5556781234', '2002-09-17', 'sara.morales@gmail.com', 'Colegio de Ciencias', 8);
+
+INSERT INTO Usuario (Id_usuario, Nombre, Apellido, Telefono, Fecha_nacimiento, Correo, Colegio_universidad, Id_universidad) 
+VALUES (9, 'Pablo', 'Vargas', '5555671234', '2000-07-05', 'pablo.vargas@gmail.com', 'Colegio Internacional', 9);
+
+INSERT INTO Usuario (Id_usuario, Nombre, Apellido, Telefono, Fecha_nacimiento, Correo, Colegio_universidad, Id_universidad) 
+VALUES (10, 'Isabel', 'García', '5552346789', '1999-10-25', 'isabel.garcia@gmail.com', 'Colegio Nacional Santiago', 10);
+
+INSERT INTO Docente (Id_docente, Nombre, Apellido) VALUES (1, 'Roberto', 'Sánchez');
+INSERT INTO Docente (Id_docente, Nombre, Apellido) VALUES (2, 'Marta', 'Gómez');
+INSERT INTO Docente (Id_docente, Nombre, Apellido) VALUES (3, 'Alberto', 'López');
+INSERT INTO Docente (Id_docente, Nombre, Apellido) VALUES (4, 'Sofía', 'Ramírez');
+INSERT INTO Docente (Id_docente, Nombre, Apellido) VALUES (5, 'Miguel', 'Hernández');
+INSERT INTO Docente (Id_docente, Nombre, Apellido) VALUES (6, 'Laura', 'Morales');
+INSERT INTO Docente (Id_docente, Nombre, Apellido) VALUES (7, 'Fernando', 'Pérez');
+INSERT INTO Docente (Id_docente, Nombre, Apellido) VALUES (8, 'Paula', 'García');
+INSERT INTO Docente (Id_docente, Nombre, Apellido) VALUES (9, 'Luis', 'Vargas');
+INSERT INTO Docente (Id_docente, Nombre, Apellido) VALUES (10, 'Elena', 'Torres');
+
+INSERT INTO Tarea (Id_tarea, Descripcion, Id_curso) VALUES (1, 'Resolver ejercicios de álgebra booleana', 1);
+INSERT INTO Tarea (Id_tarea, Descripcion, Id_curso) VALUES (2, 'Crear un programa en C', 2);
+INSERT INTO Tarea (Id_tarea, Descripcion, Id_curso) VALUES (3, 'Diseñar un modelo de base de datos', 3);
+INSERT INTO Tarea (Id_tarea, Descripcion, Id_curso) VALUES (4, 'Implementar una lista enlazada', 4);
+INSERT INTO Tarea (Id_tarea, Descripcion, Id_curso) VALUES (5, 'Configurar una red local', 5);
+INSERT INTO Tarea (Id_tarea, Descripcion, Id_curso) VALUES (6, 'Crear un sistema de gestión de proyectos', 6);
+INSERT INTO Tarea (Id_tarea, Descripcion, Id_curso) VALUES (7, 'Desarrollar una aplicación web', 7);
+INSERT INTO Tarea (Id_tarea, Descripcion, Id_curso) VALUES (8, 'Instalar y configurar un sistema operativo', 8);
+INSERT INTO Tarea (Id_tarea, Descripcion, Id_curso) VALUES (9, 'Implementar un algoritmo de búsqueda', 9);
+INSERT INTO Tarea (Id_tarea, Descripcion, Id_curso) VALUES (10, 'Desarrollar una aplicación móvil', 10);
+
+
+INSERT INTO Recomendacion (Id_recomendacion, Descripcion, Id_usuario, Id_docente) 
+VALUES (1, 'Excelente desempeño en los proyectos grupales', 1, 2);
+
+INSERT INTO Recomendacion (Id_recomendacion, Descripcion, Id_usuario, Id_docente) 
+VALUES (2, 'Gran participación en las discusiones en clase', 2, 3);
+
+INSERT INTO Recomendacion (Id_recomendacion, Descripcion, Id_usuario, Id_docente) 
+VALUES (3, 'Trabajo en equipo sobresaliente', 3, 4);
+
+INSERT INTO Recomendacion (Id_recomendacion, Descripcion, Id_usuario, Id_docente) 
+VALUES (4, 'Innovador en la creación de proyectos prácticos', 4, 5);
+
+INSERT INTO Recomendacion (Id_recomendacion, Descripcion, Id_usuario, Id_docente) 
+VALUES (5, 'Destacada habilidad de resolución de problemas', 5, 6);
+
+INSERT INTO Recomendacion (Id_recomendacion, Descripcion, Id_usuario, Id_docente) 
+VALUES (6, 'Rápido aprendizaje y dominio de conceptos', 6, 7);
+
+INSERT INTO Recomendacion (Id_recomendacion, Descripcion, Id_usuario, Id_docente) 
+VALUES (7, 'Comprometido con el aprendizaje continuo', 7, 8);
+
+INSERT INTO Recomendacion (Id_recomendacion, Descripcion, Id_usuario, Id_docente) 
+VALUES (8, 'Liderazgo en la presentación de trabajos', 8, 9);
+
+INSERT INTO Recomendacion (Id_recomendacion, Descripcion, Id_usuario, Id_docente) 
+VALUES (9, 'Colaborador eficiente en la entrega de tareas', 9, 10);
+
+INSERT INTO Recomendacion (Id_recomendacion, Descripcion, Id_usuario, Id_docente) 
+VALUES (10, 'Excelente actitud ante los retos académicos', 10, 1);
+
+INSERT INTO Curso (Id_curso, Nombre) VALUES (1, 'Matemáticas Discretas');
+INSERT INTO Curso (Id_curso, Nombre) VALUES (2, 'Introducción a la Programación');
+INSERT INTO Curso (Id_curso, Nombre) VALUES (3, 'Bases de Datos Avanzadas');
+INSERT INTO Curso (Id_curso, Nombre) VALUES (4, 'Estructuras de Datos');
+INSERT INTO Curso (Id_curso, Nombre) VALUES (5, 'Redes de Computadoras');
+INSERT INTO Curso (Id_curso, Nombre) VALUES (6, 'Ingeniería de Software');
+INSERT INTO Curso (Id_curso, Nombre) VALUES (7, 'Desarrollo Web');
+INSERT INTO Curso (Id_curso, Nombre) VALUES (8, 'Sistemas Operativos');
+INSERT INTO Curso (Id_curso, Nombre) VALUES (9, 'Inteligencia Artificial');
+INSERT INTO Curso (Id_curso, Nombre) VALUES (10, 'Programación Móvil');
+
+INSERT INTO Examen (Id_examen, Disciplina, Id_curso) VALUES (1, 'Lógica de Programación', 1);
+INSERT INTO Examen (Id_examen, Disciplina, Id_curso) VALUES (2, 'Algoritmos y Programación', 2);
+INSERT INTO Examen (Id_examen, Disciplina, Id_curso) VALUES (3, 'Base de Datos Relacional', 3);
+INSERT INTO Examen (Id_examen, Disciplina, Id_curso) VALUES (4, 'Estructuras Avanzadas', 4);
+INSERT INTO Examen (Id_examen, Disciplina, Id_curso) VALUES (5, 'Protocolos de Redes', 5);
+INSERT INTO Examen (Id_examen, Disciplina, Id_curso) VALUES (6, 'Metodologías Ágiles', 6);
+INSERT INTO Examen (Id_examen, Disciplina, Id_curso) VALUES (7, 'Desarrollo de Aplicaciones Web', 7);
+INSERT INTO Examen (Id_examen, Disciplina, Id_curso) VALUES (8, 'Sistemas Operativos', 8);
+INSERT INTO Examen (Id_examen, Disciplina, Id_curso) VALUES (9, 'Inteligencia Artificial y Machine Learning', 9);
+INSERT INTO Examen (Id_examen, Disciplina, Id_curso) VALUES (10, 'Desarrollo de Apps Móviles', 10);
+
+
+
+INSERT INTO Chat (Id_chat, Contenido, Fecha, Id_usuario, Id_docente) 
+VALUES (1, '¿Cuándo es la entrega del proyecto?', '2024-12-01', 1, 2);
+
+INSERT INTO Chat (Id_chat, Contenido, Fecha, Id_usuario, Id_docente) 
+VALUES (2, 'Tengo una duda sobre la teoría de grafos', '2024-12-02', 2, 3);
+
+INSERT INTO Chat (Id_chat, Contenido, Fecha, Id_usuario, Id_docente) 
+VALUES (3, '¿Puedo entregar la tarea tarde?', '2024-12-03', 3, 4);
+
+INSERT INTO Chat (Id_chat, Contenido, Fecha, Id_usuario, Id_docente) 
+VALUES (4, 'Me gustaría recibir retroalimentación sobre mi examen', '2024-12-04', 4, 5);
+
+INSERT INTO Chat (Id_chat, Contenido, Fecha, Id_usuario, Id_docente) 
+VALUES (5, 'Estoy listo para la prueba de mañana', '2024-12-05', 5, 6);
+
+INSERT INTO Chat (Id_chat, Contenido, Fecha, Id_usuario, Id_docente) 
+VALUES (6, '¿Puedes darme más ejemplos de prácticas?', '2024-12-06', 6, 7);
+
+INSERT INTO Chat (Id_chat, Contenido, Fecha, Id_usuario, Id_docente) 
+VALUES (7, 'Me gustaría saber si tengo los requisitos para el curso', '2024-12-07', 7, 8);
+
+INSERT INTO Chat (Id_chat, Contenido, Fecha, Id_usuario, Id_docente) 
+VALUES (8, '¿Cuál es la fecha límite para la entrega de la tarea?', '2024-12-08', 8, 9);
+
+INSERT INTO Chat (Id_chat, Contenido, Fecha, Id_usuario, Id_docente) 
+VALUES (9, '¿Hay algún material adicional para estudiar para el examen?', '2024-12-09', 9, 10);
+
+INSERT INTO Chat (Id_chat, Contenido, Fecha, Id_usuario, Id_docente) 
+VALUES (10, 'Gracias por la aclaración sobre la programación dinámica', '2024-12-10', 10, 1);
+
+
+INSERT INTO Calificacion (Id_calificacion, Puntaje, Fecha_calificacion, Comentarios, Id_docente) 
+VALUES (1, 85.50, '2024-12-01', 'Buen desempeño en la práctica', 2);
+
+INSERT INTO Calificacion (Id_calificacion, Puntaje, Fecha_calificacion, Comentarios, Id_docente) 
+VALUES (2, 92.00, '2024-12-02', 'Excelente comprensión de los conceptos', 3);
+
+INSERT INTO Calificacion (Id_calificacion, Puntaje, Fecha_calificacion, Comentarios, Id_docente) 
+VALUES (3, 75.30, '2024-12-03', 'Puede mejorar en la parte teórica', 4);
+
+INSERT INTO Calificacion (Id_calificacion, Puntaje, Fecha_calificacion, Comentarios, Id_docente) 
+VALUES (4, 89.00, '2024-12-04', 'Buen uso de herramientas avanzadas', 5);
+
+INSERT INTO Calificacion (Id_calificacion, Puntaje, Fecha_calificacion, Comentarios, Id_docente) 
+VALUES (5, 88.75, '2024-12-05', 'Excelente desempeño en trabajo en equipo', 6);
+
+INSERT INTO Calificacion (Id_calificacion, Puntaje, Fecha_calificacion, Comentarios, Id_docente) 
+VALUES (6, 91.25, '2024-12-06', 'Excelente dominio de la materia', 7);
+
+INSERT INTO Calificacion (Id_calificacion, Puntaje, Fecha_calificacion, Comentarios, Id_docente) 
+VALUES (7, 76.40, '2024-12-07', 'Debe mejorar en la entrega puntual', 8);
+
+INSERT INTO Calificacion (Id_calificacion, Puntaje, Fecha_calificacion, Comentarios, Id_docente) 
+VALUES (8, 82.10, '2024-12-08', 'Trabajo muy completo', 9);
+
+INSERT INTO Calificacion (Id_calificacion, Puntaje, Fecha_calificacion, Comentarios, Id_docente) 
+VALUES (9, 95.00, '2024-12-09', 'Excelente rendimiento general', 10);
+
+INSERT INTO Calificacion (Id_calificacion, Puntaje, Fecha_calificacion, Comentarios, Id_docente) 
+VALUES (10, 78.80, '2024-12-10', 'Buena mejora desde la última evaluación', 1);
+
+
+
+SELECT * FROM Usuario;
+SELECT * FROM Universidad;
+SELECT * FROM Docente;
+SELECT * FROM Recomendacion;
+SELECT * FROM Curso;
+SELECT * FROM Examen;
+SELECT * FROM Chat;
+SELECT * FROM Calificacion;
+
+
+--CRUD
+
+--CREAR USUARIO 
+
+CREATE PROCEDURE CrearUsuario
+    @Id_usuario CHAR(60),
+    @Nombre CHAR(60),
+    @Apellido CHAR(60),
+    @Telefono CHAR(60),
+    @Fecha_nacimiento CHAR(60),
+    @Correo CHAR(60),
+    @Colegio_universidad CHAR(60),
+    @Id_universidad CHAR(60)
+AS
+BEGIN
+    INSERT INTO Usuario (
+        Id_usuario, Nombre, Apellido, Telefono, 
+        Fecha_nacimiento, Correo, Colegio_universidad, Id_universidad
+    ) VALUES (
+        @Id_usuario, @Nombre, @Apellido, @Telefono, 
+        @Fecha_nacimiento, @Correo, @Colegio_universidad, @Id_universidad
+    )
+END
+
+
+-- EJEMPLO PARA CREAR USUARIO
+
+EXEC CrearUsuario 
+    @Id_usuario = '1', 
+    @Nombre = 'Juan', 
+    @Apellido = 'Pérez', 
+    @Telefono = '|', 
+    @Fecha_nacimiento = '1999-01-01', 
+    @Correo = 'juan@ejemplo.com', 
+    @Colegio_universidad = 'UNAM', 
+    @Id_universidad = '1'
+
+--LEER USUARIOS
+
+CREATE PROCEDURE ObtenerUsuarios
+AS
+BEGIN
+    SELECT * FROM Usuario
+END
+GO
+
+EXEC ObtenerUsuarios
+
+--LEER USUARIO CONDICION
+
+CREATE PROCEDURE ObtenerUsuarioPorApellido
+    @Apellido CHAR(60)
+AS
+BEGIN
+    SELECT * FROM Usuario 
+    WHERE Apellido = @Apellido
+	END
+GO
+
+-- EJEMPLO PARA LEER USUARIO 
+
+EXEC ObtenerUsuarioPorApellido @Apellido = 'Pérez'
+
+
+
+
+--ACTULIZAR USUARIO
+
+CREATE PROCEDURE ActualizarUsuario
+    @Id_usuario VARCHAR(60),
+    @Nombre VARCHAR(60),
+    @Apellido VARCHAR(60),
+    @Telefono VARCHAR(60),
+    @Fecha_nacimiento VARCHAR(60),
+    @Correo VARCHAR(60),
+    @Colegio_universidad VARCHAR(60),
+    @Id_universidad VARCHAR(60)
+AS
+BEGIN
+    UPDATE Usuario 
+    SET 
+        Nombre = @Nombre,
+        Apellido = @Apellido,
+        Telefono = @Telefono,
+        Fecha_nacimiento = @Fecha_nacimiento,
+        Correo = @Correo,
+        Colegio_universidad = @Colegio_universidad,
+        Id_universidad = @Id_universidad
+    WHERE Id_usuario = @Id_usuario
+END
+GO
+
+
+--EJEMPLO PARA ACTUALIZAR USUARIO
+
+EXEC ActualizarUsuario
+    @Id_usuario = '1', 
+    @Nombre = 'Juan Ito', 
+    @Apellido = 'Pérez Maldonado', 
+    @Telefono = '123-1234', 
+    @Fecha_nacimiento = '1999-01-01', 
+    @Correo = 'juan@ejemplo.com', 
+    @Colegio_universidad = 'UNAM', 
+    @Id_universidad = '1'
+
+
+--ELIMINAR USUARIO
+
+CREATE PROCEDURE EliminarUsuario
+    @Id_usuario CHAR(60)
+AS
+BEGIN
+    DELETE FROM Usuario 
+    WHERE Id_usuario = @Id_usuario
+END
+
+--EJECUTAR ELIMINAR USUARIO
+
+EXEC EliminarUsuario @Id_usuario = '1'
+
+
+SELECT * FROM Usuario;
+
+--TRIGER 1 VALIDAR QUE LA UNIVERSIDAD EXISTA
+
+CREATE TRIGGER trg_Usuario_Universidad
+ON Usuario
+FOR INSERT
+AS
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 
+        FROM Universidad 
+        WHERE Id_universidad = (SELECT Id_universidad FROM inserted)
+    )
+    BEGIN
+        RAISERROR ('La universidad especificada no existe.', 16, 1);
+        ROLLBACK TRANSACTION;
+    END
+END;
+
+--TRIGER 2 EVITAR USUARIOS DUBLICADOS
+
+CREATE TRIGGER trg_EvitarUsuariosDuplicados
+ON Usuario
+FOR INSERT
+AS
+BEGIN
+    IF EXISTS (
+        SELECT 1
+        FROM Usuario u
+        JOIN inserted i ON u.Correo = i.Correo
+    )
+    BEGIN
+        RAISERROR ('Ya existe un usuario registrado con este correo electrÃ³nico.', 16, 1);
+        ROLLBACK TRANSACTION;
+    END
+END;
+
+--TRIGER 3 VALIDAR CORREO ELECTRONICO
+
+CREATE TRIGGER ValidarCorreoUsuario
+ON Usuario
+INSTEAD OF INSERT, UPDATE
+AS
+BEGIN
+    IF EXISTS (
+        SELECT 1 
+        FROM inserted 
+        WHERE Correo NOT LIKE '%@%.%'
+    )
+    BEGIN
+        RAISERROR('El correo no tiene un formato válido', 16, 1);
+        ROLLBACK TRANSACTION;
+    END
+    ELSE
+    BEGIN
+        INSERT INTO Usuario (Id_usuario, Nombre, Apellido, Telefono, Fecha_nacimiento, Correo, Colegio_universidad, Id_universidad)
+        SELECT * FROM inserted;
+    END
+END;
+
+INSERT INTO Usuario (Id_usuario, Nombre, Apellido, Telefono, Fecha_nacimiento, Correo, Colegio_universidad, Id_universidad)
+VALUES ('U002', 'Ana', 'López', '987654321', '1992-08-10', 'ana#correo.com', 'Colegio B', 'UNI001');
+
+--TRIGER 4  garantizar que no se eliminen registros de Usuario si tiene registros dependientes en Recomendacion
+
+CREATE TRIGGER tr_PreventDeleteUsuario
+ON Usuario
+INSTEAD OF DELETE
+AS
+BEGIN
+    IF EXISTS (SELECT 1 FROM Recomendacion WHERE Id_usuario IN (SELECT Id_usuario FROM deleted))
+    BEGIN
+        PRINT 'No se puede eliminar el usuario porque tiene recomendaciones asociadas.';
+    END
+    ELSE
+    BEGIN
+        DELETE FROM Usuario WHERE Id_usuario IN (SELECT Id_usuario FROM deleted);
+    END;
+END;
